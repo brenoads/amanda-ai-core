@@ -1,0 +1,14 @@
+# Python / Virtual Environment
+venv/
+__pycache__/
+*.pyc
+
+# AI Models & Binaries (Keep the repo lightweight)
+vosk_model/
+*.onnx
+*.onnx.json
+
+# Environment/OS files
+.env
+.DS_Store
+logs/
