@@ -1,5 +1,4 @@
 -- Clean Schema for Amanda AI
--- Estrutura do banco de dados (Sem dados pessoais ou históricos)
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -11,13 +10,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Banco de dados: `ia_amanda`
+-- Database: `ia_amanda`
 --
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `activity_logs`
+-- Table structure for table `activity_logs`
 --
 
 CREATE TABLE `activity_logs` (
@@ -30,7 +29,7 @@ CREATE TABLE `activity_logs` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `amanda_profile`
+-- Table structure for table `amanda_profile`
 --
 
 CREATE TABLE `amanda_profile` (
@@ -42,14 +41,14 @@ CREATE TABLE `amanda_profile` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Inserindo perfil padrão
+-- Default profile insert
 --
 INSERT INTO `amanda_profile` (`id`, `name`, `age`, `current_mood`, `autonomy_level`) VALUES (1, 'Amanda', 24, 'happy', 5);
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `amanda_skills`
+-- Table structure for table `amanda_skills`
 --
 
 CREATE TABLE `amanda_skills` (
@@ -62,7 +61,7 @@ CREATE TABLE `amanda_skills` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `current_context`
+-- Table structure for table `current_context`
 --
 
 CREATE TABLE `current_context` (
@@ -74,7 +73,7 @@ CREATE TABLE `current_context` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `knowledge_base`
+-- Table structure for table `knowledge_base`
 --
 
 CREATE TABLE `knowledge_base` (
@@ -86,7 +85,7 @@ CREATE TABLE `knowledge_base` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `short_term_memory`
+-- Table structure for table `short_term_memory`
 --
 
 CREATE TABLE `short_term_memory` (
@@ -98,7 +97,7 @@ CREATE TABLE `short_term_memory` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Índices para tabelas
+-- Indexes for tables
 --
 
 ALTER TABLE `activity_logs`
@@ -121,7 +120,7 @@ ALTER TABLE `short_term_memory`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT para tabelas
+-- AUTO_INCREMENT for tables
 --
 
 ALTER TABLE `activity_logs`
