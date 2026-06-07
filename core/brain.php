@@ -213,4 +213,3 @@ file_put_contents($state_file, json_encode($new_state));
 echo "Ainda não tenho isso na minha base de dados. Deseja inserir essa informação agora?";
 exit;
 ?>
-
