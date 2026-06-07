@@ -1,12 +1,12 @@
 <?php
-// AMANDA AI - Cognitive Processing Core (V1)
+// AMANDA AI - Cognitive Processing Core (V1.1 - Supervised Learning Module)
 // Default timezone
 date_default_timezone_set('America/Fortaleza');
 
-// Receive command from Python
-$input_command = isset($argv[1]) ? mb_strtolower(trim($argv[1]), 'UTF-8') : '';
+// Receive command from Python (Keep raw for DB insertion, process another for matching)
+$raw_input = isset($argv[1]) ? trim($argv[1]) : '';
 
-if (empty($input_command)) {
+if (empty($raw_input)) {
     die("No command received.");
 }
 
@@ -46,14 +46,65 @@ function normalizePhonetics($text) {
     return implode(' ', $words);
 }
 
-$processed_input = removeAccents(normalizePhonetics($input_command));
+$processed_input = removeAccents(normalizePhonetics(mb_strtolower($raw_input, 'UTF-8')));
+$state_file = '/tmp/amanda_state.json';
+
+// ==========================================
+// SUPERVISED LEARNING MODULE (STATE MACHINE)
+// ==========================================
+if (file_exists($state_file)) {
+    $state_data = json_decode(file_get_contents($state_file), true);
+
+    if ($state_data['state'] === 'awaiting_confirmation') {
+        $affirmative_triggers = ['sim', 'se', 'desejo', 'certeza', 'com certeza', 'sim desejo', 'quero', 'sim quero inserir', 'sim quero'];
+        $is_yes = false;
+        
+        foreach ($affirmative_triggers as $trigger) {
+            if (strpos($processed_input, $trigger) !== false) {
+                $is_yes = true;
+                break;
+            }
+        }
+
+        if ($is_yes) {
+            $state_data['state'] = 'awaiting_answer';
+            file_put_contents($state_file, json_encode($state_data));
+            echo "Por favor, me diga qual é a resposta.";
+            exit;
+        } else {
+            unlink($state_file);
+            echo "Tudo bem, modo de aprendizado cancelado.";
+            exit;
+        }
+    }
+
+    if ($state_data['state'] === 'awaiting_answer') {
+        $question = $state_data['question'];
+        $answer = $raw_input; // Saves raw text with accents for proper TTS reading
+
+        try {
+            $pdo = new PDO("mysql:host=127.0.0.1;dbname=ia_amanda;charset=utf8", "root", "code");
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $stmt = $pdo->prepare("INSERT INTO knowledge_base (keyword, response) VALUES (:kw, :resp)");
+            $stmt->execute([':kw' => $question, ':resp' => $answer]);
+
+            unlink($state_file);
+            echo "A informação foi salva com sucesso no meu banco de dados.";
+            exit;
+        } catch (PDOException $e) {
+            unlink($state_file);
+            echo "Erro interno ao tentar salvar no banco de dados.";
+            exit;
+        }
+    }
+}
 
 // ==========================================
 // OS AUTOMATION MODULE (OPEN PROGRAMS)
 // ==========================================
 if (strpos($processed_input, 'abrir') !== false || strpos($processed_input, 'iniciar') !== false) {
     
-    // Inject GUI environment variables for Ubuntu (X11/Wayland context)
     putenv("DISPLAY=:0");
     putenv("XDG_RUNTIME_DIR=/run/user/1000");
     putenv("DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus");
@@ -150,7 +201,15 @@ try {
     exit;
 }
 
-// Fallback response
-echo "Ainda não tenho essa informação registrada na minha base de conhecimento.";
+// ==========================================
+// FALLBACK & TRIGGER LEARNING
+// ==========================================
+$new_state = [
+    'state' => 'awaiting_confirmation',
+    'question' => $processed_input // Saves the clean trigger phrase
+];
+file_put_contents($state_file, json_encode($new_state));
+
+echo "Ainda não tenho isso na minha base de dados. Deseja inserir essa informação agora?";
 exit;
 ?>
