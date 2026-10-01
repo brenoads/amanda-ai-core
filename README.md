@@ -1551,11 +1551,3 @@ Amanda AI Core aims to evolve into a **local cognitive platform** capable of:
 * Operating without permanent Internet access
 
 The objective is to move beyond a traditional chatbot architecture toward a **modular, local, autonomous, and hardware-aware AI system**.
-
----
-
-# License
-
-This project is experimental and intended for research, development, and educational purposes.
-
-Add an appropriate license to this repository before distributing or commercializing the project.
